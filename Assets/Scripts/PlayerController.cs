@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
     public Transform groundCheck;
     public float groundDistance = 0.4f;
+    float moveX, moveZ;
 
     [Header("Look")]
     public Transform playerCamera;
@@ -35,6 +36,9 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
+
+        moveX = Input.GetAxis("Horizontal");
+        moveZ = Input.GetAxis("Vertical");
     }
 
     void FixedUpdate()
@@ -44,8 +48,12 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
+
+        if(InputManager.instance.stopMovement) 
+        {
+            moveX = 0;
+            moveZ = 0;
+        }
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
         Vector3 targetVelocity = move * moveSpeed;

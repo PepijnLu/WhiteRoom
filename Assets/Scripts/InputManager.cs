@@ -4,16 +4,31 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    List<KeyAction> startKeyActions, currentKeyActions;
+    public static InputManager instance;
     KeyActionList currentList;
+    List<KeyAction> startKeyActions, currentKeyActions;
+    GameObject currentListObj;
+    Dictionary<string, GameObject> keyActionObjects;
+    public bool stopMovement;
+    [Header("KeyActions")]
     [SerializeField] GameObject startListObj;
-    [SerializeField] GameObject currentListObj;
+    [SerializeField] GameObject pianoObj;
+
+    void Awake()
+    {
+        instance = this;   
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentListObj = startListObj;
+        keyActionObjects = new()
+        {
+            ["normal"] = startListObj,
+            ["piano"] = pianoObj
+        };
 
+        currentListObj = startListObj;
         currentList = currentListObj.GetComponent<KeyActionList>();
         currentKeyActions = currentList.keyActions;
         startKeyActions = currentKeyActions;
@@ -79,6 +94,30 @@ public class InputManager : MonoBehaviour
             currentListObj = startListObj;
             currentList = currentListObj.GetComponent<KeyActionList>();
             currentKeyActions = currentList.keyActions;
+        }
+    }
+
+    public void SwitchStandardKeyActions(string _keyActions)
+    {
+        if(currentListObj == keyActionObjects[_keyActions]) return;
+
+        currentListObj = keyActionObjects[_keyActions];
+        currentList = currentListObj.GetComponent<KeyActionList>();
+        currentKeyActions = currentList.keyActions;
+        startKeyActions = currentKeyActions;
+        HandleExtraSwitchingLogic(_keyActions);
+    }
+
+    void HandleExtraSwitchingLogic(string _keyActions)
+    {
+        switch(_keyActions)
+        {
+            case "piano":
+                stopMovement = true;
+                break;
+            case "normal":
+                stopMovement = false;
+                break;
         }
     }
 }
